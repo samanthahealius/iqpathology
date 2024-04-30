@@ -361,6 +361,7 @@ function loadScript() {
 	var doctorCode = jQuery('#collect-form-code').val();
 	var encodeddoctorcode = encodeURIComponent(doctorCode);
 
+	var div = document.getElementById('supply-form');
 	var scriptElement = document.createElement('script');
 	scriptElement.type = 'text/javascript';
 	scriptElement.src = 'https://healius.jotform.com/jsform/240808241977867?doctorCode=' +encodeddoctorcode + '&doctorName[first]='+encodeURIComponent(first_name)+'&doctorName[last]='+encodeURIComponent(last_name)+'&surgeryName='+encodeURIComponent(surgery_name)+'&surgeryCode='+encodeURIComponent(surgery_code)+'&phoneNumber='+encodeURIComponent(surgery_phone)+'&address[addr_line1]='+encodeURIComponent(surgery_street)+'&address[city]='+encodeURIComponent(surgery_city)+'&address[postal]='+encodeURIComponent(surgery_postal)+'&address[state]='+encodeURIComponent(surgery_state);
@@ -370,8 +371,7 @@ function loadScript() {
 	  console.log('Script loaded successfully.');
 	};
   
-	// Append the script to the head of the document
-	jQuery('#supply-form').appendChild(scriptElement);
+	div.appendChild(scriptElement);
   }
 
 // Function to construct URL and redirect
