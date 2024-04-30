@@ -19,6 +19,16 @@ var sLocationSearchURL = sWebAPIHost + '/collect/search/';
 var initialized = false;
 var oFound;
 
+var first_name;
+var last_name;
+var surgery_name;
+var surgery_phone;
+var surgery_code;
+var surgery_street;
+var surgery_city;
+var surgery_postal;
+var surgery_state;
+
 catalogueLoad();
 
 jQuery(document).ready(function(){
@@ -126,6 +136,7 @@ function init(){
 	jQuery('#collect-form-pickup-location-confirm')
 		.change(function(){
 			if(jQuery(this).prop('checked')){
+				loadScript();
 				jQuery('#collect-form-pickup-location-check').button('option', 'disabled', true)
 				jQuery('#collect-form-pickup-location, #collect-form-pickup-location-search').prop('disabled', true);
 				jQuery('#collect-form-job').prop('disabled', false).show('fade', function(){
@@ -346,25 +357,43 @@ function enabledDisablePickupLocationCheckButton(){
 	jQuery('#collect-form-pickup-location-check').button('option', 'disabled', disabled);
 }
 
+function loadScript() {
+	var doctorCode = jQuery('#collect-form-code').val();
+	var encodeddoctorcode = encodeURIComponent(doctorCode);
+
+	var scriptElement = document.createElement('script');
+	scriptElement.type = 'text/javascript';
+	scriptElement.src = 'https://healius.jotform.com/jsform/240808241977867?doctorCode=' +encodeddoctorcode + '&doctorName[first]='+encodeURIComponent(first_name)+'&doctorName[last]='+encodeURIComponent(last_name)+'&surgeryName='+encodeURIComponent(surgery_name)+'&surgeryCode='+encodeURIComponent(surgery_code)+'&phoneNumber='+encodeURIComponent(surgery_phone)+'&address[addr_line1]='+encodeURIComponent(surgery_street)+'&address[city]='+encodeURIComponent(surgery_city)+'&address[postal]='+encodeURIComponent(surgery_postal)+'&address[state]='+encodeURIComponent(surgery_state);
+  
+	// Optionally, handle the script load event
+	scriptElement.onload = function() {
+	  console.log('Script loaded successfully.');
+	};
+  
+	// Append the script to the head of the document
+	document.head.appendChild(scriptElement);
+  }
+
 // Function to construct URL and redirect
-function redirectToDoctorPage(firstName, lastName, surgeryName, surgeryCode, phoneNumber, address1, city, postal, state ) {
-    // Encode the first name and last name to ensure they are URL-safe
-    var encodedFirstName = encodeURIComponent(firstName);
-    var encodedLastName = encodeURIComponent(lastName);
-	var encodedsurgeryName = encodeURIComponent(surgeryName);
-	var encodedsurgeryCode = encodeURIComponent(surgeryCode);
-	var encodedphoneNumber = encodeURIComponent(phoneNumber);
-	var encodedaddress1 = encodeURIComponent(address1);
-	var encodedcity = encodeURIComponent(city);
-	var encodedstate = encodeURIComponent(state);
-	var encodedpostal = encodeURIComponent(postal);
+// function redirectToDoctorPage() {
+//     // Encode the first name and last name to ensure they are URL-safe
+//     // var encodedFirstName = encodeURIComponent(firstName);
+//     // var encodedLastName = encodeURIComponent(lastName);
+// 	// var encodedsurgeryName = encodeURIComponent(surgeryName);
+// 	var doctorCode = jQuery('#collect-form-code').val();
+// 	var encodeddoctorcode = encodeURIComponent(doctorCode);
+// 	// var encodedphoneNumber = encodeURIComponent(phoneNumber);
+// 	// var encodedaddress1 = encodeURIComponent(address1);
+// 	// var encodedcity = encodeURIComponent(city);
+// 	// var encodedstate = encodeURIComponent(state);
+// 	// var encodedpostal = encodeURIComponent(postal);
 
-    // Construct the URL with the encoded query parameters
-    var url = "https://www.iqpathology.com.au/doctors/supplies/?doctorName[first]=" + encodedFirstName + "&doctorName[last]=" + encodedLastName+ "&surgeryName=" + encodedsurgeryName+ "&surgeryCode=" + encodedsurgeryCode+ "&phoneNumber=" + encodedphoneNumber+ "&address[addr_line1]=" + encodedaddress1+ "&address[city]=" + encodedcity+ "&address[postal]=" + encodedpostal+ "&address[state]=" + encodedstate;
+//     // Construct the URL with the encoded query parameters
+//     var url = "https://www.iqpathology.com.au/doctors/supplies/?doctorCode=" + encodeddoctorcode;
 
-    // Redirect the browser to the constructed URL
-    window.location.href = url;
-}
+//     // Redirect the browser to the constructed URL
+//     window.location.href = url;
+// }
 
 function locationGet(sType, sText){
 	if(sText == '') return;
@@ -378,6 +407,7 @@ function locationGet(sType, sText){
 	jQuery('#collect-form-pickup-location-check-loader').show();
 
 	oFound = null;
+
 	jQuery.get(sLocationSearchURL + '?ctype=' + encodeURIComponent(sCollectionTypeId) + '&type=' + encodeURIComponent(sType) + '&text=' + encodeURIComponent(sText))
 		.done(function(result){
 			//console.log('locationGet finished (SUCCESS)', result);
@@ -393,7 +423,16 @@ function locationGet(sType, sText){
 				jQuery('#collect-form-surgery-city').val(result.surgery.city);
 				jQuery('#collect-form-surgery-postcode').val(result.surgery.postcode);
 				jQuery('#collect-form-surgery-state').val(result.surgery.state);
-				
+
+				first_name = result.first_name;
+				last_name = result.last_name;
+				surgery_name = result.surgery.name;
+				surgery_phone = result.surgery.phone;
+				surgery_street = result.surgery.addr;
+				surgery_city = result.surgery.city;
+				surgery_postal = result.surgery.postcode;
+				surgery_state = result.surgery.state;
+				surgery_code = result.surgery.code;
 
 				checkSurgery();
 				confirmation.find('.option').hide();
@@ -410,8 +449,6 @@ function locationGet(sType, sText){
 				enabledDisablePickupLocationConfirmCheckbox(true);
 
 			
-
-				redirectToDoctorPage(result.first_name, result.last_name,result.surgery.name,result.surgery.code,result.surgery.phone, result.surgery.addr, result.surgery.city, result.surgery.postcode,result.surgery.state  );
 			} else {
 				searchMessage.find('.option').hide();
 				searchMessage.find('.option.option-not-found').show();
