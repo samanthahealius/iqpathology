@@ -371,7 +371,7 @@ function loadScript() {
 	};
   
 	// Append the script to the head of the document
-	document.head.appendChild(scriptElement);
+	jQuery('#supply-form').appendChild(scriptElement);
   }
 
 // Function to construct URL and redirect
