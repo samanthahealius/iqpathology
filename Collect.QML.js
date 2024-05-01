@@ -151,6 +151,7 @@ function init(){
 				jQuery('#collect-form-pickup-location, #collect-form-pickup-location-search').prop('disabled', false);
 				jQuery('#collect-form-job').prop('disabled', true).hide('fade');
 				jQuery('#collect-form-actions').prop('disabled', true).hide('fade');
+				resetForm();
 			}
 		})
 	;
@@ -214,6 +215,7 @@ function init(){
 		jQuery('#collect-form-code').val('').focus();
 
 		enabledDisablePickupLocationCheckButton();
+		resetForm();
 	});
 
 	enabledDisablePickupLocationCheckButton();
@@ -224,6 +226,10 @@ function init(){
 	//console.log('init done');
 }
 
+function resetForm() {
+    var div = document.getElementById('supply-form');
+    div.innerHTML = ''; // This sets the inner HTML of the div to an empty string, effectively clearing it.
+}
 
 function formJobReset(){
 	var login = jQuery('#collect-form-code').val();
